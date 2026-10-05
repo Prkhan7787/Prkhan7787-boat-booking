@@ -1,0 +1,13 @@
+function userHome(role){return role==='admin'?'/admin/index.html':role==='boat_owner'?'/owner/index.html':'/'}
+function requireRole(roles){const token=localStorage.getItem('boatAdminToken');let user;try{user=JSON.parse(localStorage.getItem('boatAdminUser')||'null')}catch{}if(!token){location.replace('/pages/login.html?next='+encodeURIComponent(location.pathname));return false}if(!user||!roles.includes(user.role)){location.replace(userHome(user?.role));return false}return true}
+function requireAdmin(){return requireRole(['admin'])}
+function requireOwner(){return requireRole(['boat_owner'])}
+document.addEventListener('DOMContentLoaded',()=>{
+ const form=document.querySelector('#login-form');
+ if(form&&!form.querySelector('[data-register-link]')){const link=document.createElement('p');link.dataset.registerLink='1';link.style.textAlign='center';link.innerHTML='ยังไม่มีบัญชี? <a href="/pages/register.html">สมัครสมาชิก</a>';form.append(link)}
+ form?.addEventListener('submit',async e=>{e.preventDefault();const button=form.querySelector('button');button.disabled=true;button.textContent='กำลังเข้าสู่ระบบ…';try{const data=await api('/auth/login',{method:'POST',body:JSON.stringify(Object.fromEntries(new FormData(form)))});localStorage.setItem('boatAdminToken',data.token);localStorage.setItem('boatAdminUser',JSON.stringify(data.user));const next=query('next'),role=data.user.role;const safeNext=next?.startsWith('/')&&!next.startsWith('//')&&(!next.startsWith('/owner/')||role==='boat_owner')&&(!next.startsWith('/admin/')||role==='admin');location.href=safeNext?next:userHome(role)}catch(err){showError('#login-error',err.message);button.disabled=false;button.textContent='เข้าสู่ระบบ'}});
+ const register=document.querySelector('#register-form');
+ register?.addEventListener('submit',async e=>{e.preventDefault();const button=register.querySelector('button[type="submit"]');const data=Object.fromEntries(new FormData(register));if(data.password!==data.confirmPassword){showError('#register-error','รหัสผ่านและการยืนยันรหัสผ่านไม่ตรงกัน');return}delete data.confirmPassword;button.disabled=true;button.textContent='กำลังสมัครสมาชิก…';try{await api('/auth/register',{method:'POST',body:JSON.stringify(data)});location.href='/pages/login.html?registered=1'}catch(err){showError('#register-error',err.message);button.disabled=false;button.textContent='สมัครสมาชิก'}});
+ if(query('registered')==='1'){const notice=document.querySelector('#login-success');if(notice)notice.textContent='สมัครสมาชิกสำเร็จ กรุณาเข้าสู่ระบบ'}
+ document.querySelectorAll('[data-logout]').forEach(b=>b.addEventListener('click',()=>{localStorage.removeItem('boatAdminToken');localStorage.removeItem('boatAdminUser');location.href='/pages/login.html'}));
+});
