@@ -1,25 +1,14 @@
 {
-  "name": "boat-booking-api",
+  "name": "boat-booking-website",
   "version": "1.0.0",
   "private": true,
-  "description": "Boat Booking System REST API",
+  "description": "Boat booking website with browser-local storage",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node --watch server.js",
-    "db:setup": "node scripts/setup-db.js",
-    "seed": "node scripts/seed.js",
-    "check": "node --check server.js && node --check middleware/auth.middleware.js && node --check middleware/error.middleware.js && node --check scripts/seed.js && node --check scripts/setup-db.js && node --check ../frontend/js/api.js && node --check ../frontend/js/main.js && node --check ../frontend/js/boats.js && node --check ../frontend/js/booking.js && node --check ../frontend/js/auth.js && node --check ../frontend/js/admin.js && node --check ../frontend/js/owner.js",
-    "test": "node --test"
+    "check": "node --check server.js && node --check ../frontend/js/api.js && node --check ../frontend/js/main.js && node --check ../frontend/js/boats.js && node --check ../frontend/js/booking.js && node --check ../frontend/js/boat-form.js && node --check ../frontend/js/history.js"
   },
-  "engines": { "node": ">=18" },
-  "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
-    "express": "^4.21.2",
-    "helmet": "^8.0.0",
-    "jsonwebtoken": "^9.0.2",
-    "pg": "^8.13.1"
+  "engines": {
+    "node": ">=18"
   }
 }
